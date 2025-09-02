@@ -1,42 +1,37 @@
-resource "aws_vpc" "this" {
+resource "aws_vpc" "vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags                 = merge(var.tags, { Name = "${var.project_name}-vpc" })
+  tags                 = var.tags
 }
 
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.this.id
-  tags   = merge(var.tags, { Name = "${var.project_name}-igw" })
+  vpc_id = aws_vpc.vpc.id
+  tags   = var.tags
 }
 
-resource "aws_subnet" "public" {
-  for_each = {
-    a = { az = 0, cidr = "10.0.1.0/24" },
-    b = { az = 1, cidr = "10.0.2.0/24" }
-  }
-  vpc_id                  = aws_vpc.this.id
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.vpc.id
   cidr_block              = each.value.cidr
-  availability_zone       = "${data.aws_region.current.name}${each.value.az == 0 ? "a" : "b"}"
+  availability_zone       = "${data.aws_region.current.name}a"
   map_public_ip_on_launch = true
-  tags                    = merge(var.tags, { Name = "${var.project_name}-public-${each.key}" })
+  tags                    = var.tags
 }
 
 data "aws_region" "current" {}
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id
-  tags   = merge(var.tags, { Name = "${var.project_name}-public-rt" })
+resource "aws_route_table" "public_route" {
+  vpc_id = aws_vpc.vpc.id
 }
 
 resource "aws_route" "default_internet" {
-  route_table_id         = aws_route_table.public.id
+  route_table_id         = aws_route_table.public_route.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id
 }
 
-resource "aws_route_table_association" "public" {
-  for_each       = aws_subnet.public
+resource "aws_route_table_association" "public_routes_assoc" {
+  for_each       = aws_subnet.public_subnet
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public_route.id
 }

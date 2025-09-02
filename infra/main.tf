@@ -1,20 +1,14 @@
-locals {
-  tags = {
-    Project = var.project_name
-    Managed = "terraform"
-  }
-}
 
 module "vpc" {
   source       = "./modules/vpc"
   project_name = var.project_name
-  tags         = local.tags
+  tags         = var.tags
 }
 
 module "ecr" {
   source       = "./modules/ecr"
   project_name = var.project_name
-  tags         = local.tags
+  tags         = var.tags
 }
 
 module "ecs" {
@@ -25,5 +19,5 @@ module "ecs" {
   container_port       = var.container_port
   ecr_repository_url   = module.ecr.repository_url
   app_healthcheck_path = var.app_healthcheck_path
-  tags                 = local.tags
+  tags                 = var.tags
 }

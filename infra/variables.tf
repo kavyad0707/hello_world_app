@@ -1,23 +1,19 @@
 variable "project_name" {
-  type        = string
-  description = "Project name (also used as name prefix)."
-  default     = "hello-fargate"
+  type = string
 }
 
 variable "region" {
-  type        = string
-  description = "AWS region."
-  default     = "us-east-1"
+  type = string
 }
 
 variable "container_port" {
-  type        = number
-  description = "Container port for the app."
-  default     = 3000
+  type = number
 }
 
 variable "app_healthcheck_path" {
-  type        = string
-  description = "Health check path for ALB target group."
-  default     = "/"
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
 }
