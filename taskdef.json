@@ -1,0 +1,26 @@
+{
+  "family": "hello-fargate-td",
+  "networkMode": "awsvpc",
+  "executionRoleArn": "REPLACE_WITH_EXECUTION_ROLE_ARN",
+  "cpu": "256",
+  "memory": "512",
+  "requiresCompatibilities": ["FARGATE"],
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "REPLACE_IMAGE",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 3000, "hostPort": 3000, "protocol": "tcp" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/hello-fargate",
+          "awslogs-region": "REPLACE_AWS_REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
